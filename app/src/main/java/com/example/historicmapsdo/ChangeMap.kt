@@ -19,6 +19,7 @@ class ChangeMap : AppCompatActivity() {
 
         if(checkedId!=-1) {
             Toast.makeText(applicationContext, "Selected ${findViewById<RadioButton>(checkedId).text}", Toast.LENGTH_SHORT).show()
+            finish()
         } else {
             Toast.makeText(applicationContext, "Select a Map!", Toast.LENGTH_SHORT).show()
         }
