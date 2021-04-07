@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -17,12 +18,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private val dortmund = LatLng(51.514426, 7.467263)
 
+    private var mapStatus: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
@@ -43,7 +46,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dortmund, 15f))
     }
 
-    fun openChangeMap(view: View){
-        startActivity(Intent(this, ChangeMap::class.java))
+    fun openChangeMap(view: View) {
+        startActivityForResult(Intent(this, ChangeMap::class.java), 1)
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        mapStatus = if (data?.getStringExtra("year") != null) data.getStringExtra("year")!!.toInt() else 0
+        changeMap()
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun changeMap() {
+        when(mapStatus){
+            1858 -> {}
+            1945 -> {}
+            2015 -> {}
+        }
+    }
+
+    /*override fun onResume() {
+        Toast.makeText(applicationContext, "Called onResume", Toast.LENGTH_SHORT).show()
+        super.onResume()
+    }*/
 }

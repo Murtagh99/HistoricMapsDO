@@ -1,5 +1,6 @@
 package com.example.historicmapsdo
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -18,7 +19,8 @@ class ChangeMap : AppCompatActivity() {
         val checkedId: Int = radioGroup.checkedRadioButtonId
 
         if(checkedId!=-1) {
-            Toast.makeText(applicationContext, "Selected ${findViewById<RadioButton>(checkedId).text}", Toast.LENGTH_SHORT).show()
+            val year = findViewById<RadioButton>(checkedId).text.substring(9)
+            setResult(RESULT_OK, Intent().putExtra("year", year))
             finish()
         } else {
             Toast.makeText(applicationContext, "Select a Map!", Toast.LENGTH_SHORT).show()
