@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -45,6 +44,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun openChangeMap(view: View){
-        startActivity(Intent(this, changeMap::class.java))
+        startActivity(Intent(this, ChangeMap::class.java))
     }
 }
