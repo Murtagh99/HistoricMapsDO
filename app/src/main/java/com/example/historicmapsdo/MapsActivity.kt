@@ -18,7 +18,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private val dortmund = LatLng(51.514426, 7.467263)
     private lateinit var mLastSelectedMarker: Marker
-
+    private val markerListener = MarkerDragListener()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +42,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         mLastSelectedMarker = mMap.addMarker(MarkerOptions().position(dortmund).title("Marker in Dortmund").draggable(true))
+        mMap.setOnMarkerDragListener(markerListener)
         // Add a marker in Sydney and move the camera
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dortmund, 15f))
     }
