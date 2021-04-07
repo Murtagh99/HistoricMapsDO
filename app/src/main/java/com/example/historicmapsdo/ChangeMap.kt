@@ -15,10 +15,10 @@ class ChangeMap : AppCompatActivity() {
 
     fun applyMapChange(view: View){
         val radioGroup: RadioGroup = findViewById(R.id.mapChoices)
-        val checkedId = radioGroup.checkedRadioButtonId
-        val checkedRadioButton: RadioButton = findViewById(checkedId)
+        val checkedId: Int = radioGroup.checkedRadioButtonId
+
         if(checkedId!=-1) {
-            Toast.makeText(applicationContext, "Selected ${checkedRadioButton.text}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Selected ${findViewById<RadioButton>(checkedId).text}", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(applicationContext, "Select a Map!", Toast.LENGTH_SHORT).show()
         }
