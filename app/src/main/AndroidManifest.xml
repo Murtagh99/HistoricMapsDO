@@ -40,9 +40,4 @@
             </intent-filter>
         </activity>
     </application>
-
-    <!--
-            Test
-     -->
-
 </manifest>
