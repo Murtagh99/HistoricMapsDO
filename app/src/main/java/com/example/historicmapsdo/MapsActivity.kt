@@ -1,21 +1,24 @@
 package com.example.historicmapsdo
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private val dortmund = LatLng(51.514426, 7.467263)
+    private lateinit var mLastSelectedMarker: Marker
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,12 +41,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        mLastSelectedMarker = mMap.addMarker(MarkerOptions().position(dortmund).title("Marker in Dortmund").draggable(true))
         // Add a marker in Sydney and move the camera
-        mMap.addMarker(MarkerOptions().position(dortmund).title("Marker in Dortmund"))
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dortmund, 15f))
     }
 
     fun openChangeMap(view: View){
         startActivity(Intent(this, ChangeMap::class.java))
     }
+
 }
