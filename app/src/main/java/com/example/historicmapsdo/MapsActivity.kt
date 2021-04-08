@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -19,6 +18,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private val dortmund = LatLng(51.514426, 7.467263)
+    private lateinit var mapOverlay: GroundOverlay
+
     private lateinit var mLastSelectedMarker: Marker
     private val markerListener = MarkerDragListener()
 
@@ -64,20 +65,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun changeMap() {
         if (mapStatus != 0) {
             val latLng = LatLng(51.51399991201712, 7.4639976024627686)
-            val mapOver = GroundOverlayOptions()
+            val mapOverOpt = GroundOverlayOptions()
             when (mapStatus) {
                 1858 -> {
-                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1858))
+                    mapOverOpt.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1858))
                 }
                 1945 -> {
-                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1945))
+                    mapOverOpt.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1945))
                 }
                 2015 -> {
-                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_2015))
+                    mapOverOpt.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_2015))
                 }
             }
-            mapOver.position(latLng, 1375f)
-            mMap.addGroundOverlay(mapOver)
+            mapOverOpt.position(latLng, 1375f)
+            mapOverlay = mMap.addGroundOverlay(mapOverOpt)
+        } else {
+            mapOverlay.remove()
         }
     }
 }
