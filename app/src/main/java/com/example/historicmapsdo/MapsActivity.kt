@@ -10,8 +10,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -57,11 +56,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun changeMap() {
+        val latLng = LatLng(51.514426, 7.467263)
+        val mapOver = GroundOverlayOptions()
         when(mapStatus){
-            1858 -> {}
-            1945 -> {}
-            2015 -> {}
+            1858 -> {mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1858))}
+            1945 -> {mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1945))}
+            2015 -> {mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_2015))}
         }
+        mapOver.position(latLng, 2000f)
+        mMap.addGroundOverlay(mapOver)
     }
 
     /*override fun onResume() {
