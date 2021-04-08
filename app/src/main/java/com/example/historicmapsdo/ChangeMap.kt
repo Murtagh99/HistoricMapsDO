@@ -20,7 +20,8 @@ class ChangeMap : AppCompatActivity() {
 
         if(checkedId!=-1) {
             val year = findViewById<RadioButton>(checkedId).text.substring(9)
-            setResult(RESULT_OK, Intent().putExtra("year", year))
+            if (year.toIntOrNull() != null)
+                setResult(RESULT_OK, Intent().putExtra("year", year))
             finish()
         } else {
             Toast.makeText(applicationContext, "Select a Map!", Toast.LENGTH_SHORT).show()

@@ -62,14 +62,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun changeMap() {
-        val latLng = LatLng(51.514426, 7.467263)
-        val mapOver = GroundOverlayOptions()
-        when(mapStatus){
-            1858 -> {mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1858))}
-            1945 -> {mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1945))}
-            2015 -> {mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_2015))}
+        if (mapStatus != 0) {
+            val latLng = LatLng(51.51399991201712, 7.4639976024627686)
+            val mapOver = GroundOverlayOptions()
+            when (mapStatus) {
+                1858 -> {
+                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1858))
+                }
+                1945 -> {
+                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1945))
+                }
+                2015 -> {
+                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_2015))
+                }
+            }
+            mapOver.position(latLng, 1375f)
+            mMap.addGroundOverlay(mapOver)
         }
-        mapOver.position(latLng, 2000f)
-        mMap.addGroundOverlay(mapOver)
     }
 }

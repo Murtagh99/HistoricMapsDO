@@ -26,6 +26,12 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <RadioButton
+                android:id="@+id/Standard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/stnd_map" />
+
+            <RadioButton
                 android:id="@+id/Dortmund1858"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
