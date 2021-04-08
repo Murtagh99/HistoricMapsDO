@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -15,12 +14,13 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.*
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener, GoogleMap.OnMapClickListener {
 
     private lateinit var mMap: GoogleMap
-    private val dortmund = LatLng(51.514426, 7.467263)
+    private val defaultLocationDortmund = LatLng(51.514426, 7.467263)
+
     private lateinit var mLastSelectedMarker: Marker
-    private val markerListener = MarkerDragListener()
+    private lateinit var mActiveSelectedMarker : Marker
 
     private var mapStatus: Int = 0
 
@@ -45,10 +45,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        mLastSelectedMarker = mMap.addMarker(MarkerOptions().position(dortmund).title("Marker in Dortmund").draggable(true))
-        mMap.setOnMarkerDragListener(markerListener)
+        mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Marker in Dortmund").draggable(true))
+        mMap.setOnMarkerDragListener(this)
+        mMap.setOnMapClickListener(this)
         // Add a marker in Sydney and move the camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dortmund, 15f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocationDortmund, 15f))
     }
 
     fun openChangeMap(view: View) {
@@ -78,6 +79,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             mapOver.position(latLng, 1375f)
             mMap.addGroundOverlay(mapOver)
+        }
+    }
+
+    override fun onMarkerDragEnd(p0: Marker?) {}
+
+    override fun onMarkerDragStart(p0: Marker?) {
+        if (p0 != null) {
+            mLastSelectedMarker = p0
+        }
+    }
+
+    override fun onMarkerDrag(p0: Marker?) {}
+
+    override fun onMapClick(p0: LatLng?) {
+        if (p0 is LatLng) {
+  //          mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(p0).title("Marker in Dortmund").draggable(true))
+            mActiveSelectedMarker.position = p0
+        }
+        else {
+            println("No LatLng found...")
         }
     }
 }
