@@ -1,21 +1,26 @@
 package com.example.historicmapsdo
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private val dortmund = LatLng(51.514426, 7.467263)
+    private lateinit var mLastSelectedMarker: Marker
+    private val markerListener = MarkerDragListener()
 
     private var mapStatus: Int = 0
 
@@ -24,7 +29,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+                .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
@@ -40,8 +45,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        mLastSelectedMarker = mMap.addMarker(MarkerOptions().position(dortmund).title("Marker in Dortmund").draggable(true))
+        mMap.setOnMarkerDragListener(markerListener)
         // Add a marker in Sydney and move the camera
-        mMap.addMarker(MarkerOptions().position(dortmund).title("Marker in Dortmund"))
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dortmund, 15f))
     }
 
@@ -66,9 +72,4 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapOver.position(latLng, 2000f)
         mMap.addGroundOverlay(mapOver)
     }
-
-    /*override fun onResume() {
-        Toast.makeText(applicationContext, "Called onResume", Toast.LENGTH_SHORT).show()
-        super.onResume()
-    }*/
 }
