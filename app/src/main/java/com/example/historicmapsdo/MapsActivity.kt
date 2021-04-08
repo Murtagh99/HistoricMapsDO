@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
+
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -11,7 +13,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-
+import com.google.android.gms.maps.model.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -19,6 +21,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private val dortmund = LatLng(51.514426, 7.467263)
     private lateinit var mLastSelectedMarker: Marker
     private val markerListener = MarkerDragListener()
+
+    private var mapStatus: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +51,33 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dortmund, 15f))
     }
 
-    fun openChangeMap(view: View){
-        startActivity(Intent(this, ChangeMap::class.java))
+    fun openChangeMap(view: View) {
+        startActivityForResult(Intent(this, ChangeMap::class.java), 1)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        mapStatus = if (data?.getStringExtra("year") != null) data.getStringExtra("year")!!.toInt() else 0
+        changeMap()
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun changeMap() {
+        if (mapStatus != 0) {
+            val latLng = LatLng(51.51399991201712, 7.4639976024627686)
+            val mapOver = GroundOverlayOptions()
+            when (mapStatus) {
+                1858 -> {
+                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1858))
+                }
+                1945 -> {
+                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1945))
+                }
+                2015 -> {
+                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_2015))
+                }
+            }
+            mapOver.position(latLng, 1375f)
+            mMap.addGroundOverlay(mapOver)
+        }
+    }
 }
