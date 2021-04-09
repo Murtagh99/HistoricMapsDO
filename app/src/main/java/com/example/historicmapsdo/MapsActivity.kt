@@ -32,7 +32,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var mLastSelectedMarker: LatLng
     private lateinit var mActiveSelectedMarker: Marker
 
-    private lateinit var mapStatus: String
+    private var mapStatus: String = "Standard Karte"
 
     private var mapList: ArrayList<JSONConsumer> = arrayListOf()
 
@@ -81,13 +81,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        mapStatus = if (data?.getStringExtra("selectedMap") != "Standard Karte") data?.getStringExtra("selectedMap")!! else ""
+        mapStatus = if (data != null) data.getStringExtra("selectedMap")!! else "Standard Karte"
         changeMap()
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun changeMap() {
-        if (mapStatus != "") {
+        if (mapStatus != "Standard Karte") {
             val selectedMap: JSONConsumer = mapList.filter { it.properties.name == mapStatus }.first()
             println(selectedMap.geometry.coordinates[1])
             println(selectedMap.properties.width)
