@@ -7,6 +7,7 @@
     tools:context=".ChangeMap">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -30,34 +31,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stnd_map" />
-
-            <RadioButton
-                android:id="@+id/Dortmund1858"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/but_1858" />
-
-            <RadioButton
-                android:id="@+id/Dortmund1945"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/but_1945" />
-
-            <RadioButton
-                android:id="@+id/Dortmund2015"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/but_2015" />
         </RadioGroup>
 
         <Button
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:onClick="applyMapChange"
             android:text="@string/apply"
             android:textColor="#FFFFFF"
-            android:layout_marginTop="20dp"
             app:backgroundTint="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

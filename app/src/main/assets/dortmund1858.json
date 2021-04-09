@@ -1,0 +1,13 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [7.4639976024627686, 51.51399991201712]
+  },
+  "properties": {
+    "name": "Dortmund 1858",
+    "pictureName": "dortmund_1858",
+    "width": 1375,
+    "height": null
+  }
+}
