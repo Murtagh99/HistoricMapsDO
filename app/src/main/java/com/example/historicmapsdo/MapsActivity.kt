@@ -14,7 +14,8 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.*
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener, GoogleMap.OnMapClickListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener, GoogleMap.OnMapClickListener,
+    GoogleMap.OnMarkerClickListener{
 
     private lateinit var mMap: GoogleMap
     private val defaultLocationDortmund = LatLng(51.514426, 7.467263)
@@ -94,11 +95,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMapClick(p0: LatLng?) {
         if (p0 is LatLng) {
-  //          mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(p0).title("Marker in Dortmund").draggable(true))
             mActiveSelectedMarker.position = p0
         }
         else {
             println("No LatLng found...")
+        }
+    }
+
+    override fun onMarkerClick(p0: Marker?): Boolean {
+        if (p0 is Marker) {
+            return true
+        } else {
+            return false
         }
     }
 }
