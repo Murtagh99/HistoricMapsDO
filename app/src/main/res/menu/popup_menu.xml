@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_switchToNewLocation"
+        android:title="@string/newLoc"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_revertToOldLocation"
+        android:title="@string/revLoc"
+        app:showAsAction="never"/>
+</menu>

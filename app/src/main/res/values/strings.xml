@@ -7,4 +7,6 @@
     <string name="but_2015">Dortmund 2015</string>
     <string name="stnd_map">Standard Karte</string>
     <string name="apply">Apply</string>
+    <string name="newLoc">Switch to new location</string>
+    <string name="revLoc">Go back to previous one</string>
 </resources>
