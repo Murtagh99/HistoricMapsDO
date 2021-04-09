@@ -27,7 +27,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mapOverlay: GroundOverlay
 
     private val defaultLocationDortmund = LatLng(51.514426, 7.467263)
-    private val markerClass: MarkerClass = MarkerClass()
+    private val markerClass: MarkerClass = MarkerClass(this)
 
     private var mapStatus: String = "Standard Karte"
     private var mapList: ArrayList<JSONConsumer> = arrayListOf()
@@ -63,7 +63,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        markerClass.mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Marker in Dortmund").draggable(true))
+        markerClass.mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Standortmarker").draggable(true))
         mMap.setOnMarkerDragListener(markerClass)
         mMap.setOnMapClickListener(markerClass)
         // Add a marker in Sydney and move the camera
