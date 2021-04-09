@@ -1,7 +1,10 @@
 package com.example.historicmapsdo
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
@@ -13,6 +16,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.*
+import com.google.gson.Gson
+import java.io.File
+import java.io.IOException
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -23,7 +29,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mLastSelectedMarker: Marker
     private val markerListener = MarkerDragListener()
 
-    private var mapStatus: Int = 0
+    private lateinit var mapStatus: String
+
+    private var mapList: ArrayList<JSONConsumer> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +40,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        readAssets()
+    }
+
+    private fun readAssets() {
+        val maps = assets.list("")?.filter { it.endsWith(".json") }
+        maps?.forEach {
+            val jsonFileString = getJsonDataFromAsset(applicationContext, it)
+            val gson = Gson()
+            mapList.add(gson.fromJson(jsonFileString, JSONConsumer::class.java))
+        }
     }
 
     /**
@@ -53,34 +71,41 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun openChangeMap(view: View) {
-        startActivityForResult(Intent(this, ChangeMap::class.java), 1)
+        val namesOfMapList = arrayListOf<String>()
+        mapList.forEach { namesOfMapList.add(it.properties.name) }
+        startActivityForResult(Intent(this, ChangeMap::class.java).putStringArrayListExtra("mapList", namesOfMapList), 1)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        mapStatus = if (data?.getStringExtra("year") != null) data.getStringExtra("year")!!.toInt() else 0
+        mapStatus = if (data?.getStringExtra("selectedMap") != "Standard Karte") data?.getStringExtra("selectedMap")!! else ""
         changeMap()
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun changeMap() {
-        if (mapStatus != 0) {
-            val latLng = LatLng(51.51399991201712, 7.4639976024627686)
+        if (mapStatus != "") {
+            val selectedMap: JSONConsumer = mapList.filter { it.properties.name == mapStatus }.first()
+            println(selectedMap.geometry.coordinates[1])
+            println(selectedMap.properties.width)
+            val latLng = LatLng(selectedMap.geometry.coordinates[1], selectedMap.geometry.coordinates[0])
             val mapOverOpt = GroundOverlayOptions()
-            when (mapStatus) {
-                1858 -> {
-                    mapOverOpt.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1858))
-                }
-                1945 -> {
-                    mapOverOpt.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1945))
-                }
-                2015 -> {
-                    mapOverOpt.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_2015))
-                }
-            }
-            mapOverOpt.position(latLng, 1375f)
+            mapOverOpt.image(BitmapDescriptorFactory.fromResource(resources.getIdentifier(selectedMap.properties.pictureName, "drawable", applicationContext.packageName)))
+            mapOverOpt.position(latLng, selectedMap.properties.width)
             mapOverlay = mMap.addGroundOverlay(mapOverOpt)
         } else {
-            mapOverlay.remove()
+            if(this::mapOverlay.isInitialized)
+                mapOverlay.remove()
         }
+    }
+
+    fun getJsonDataFromAsset(context: Context, fileName: String): String? {
+        val jsonString: String
+        try {
+            jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+            return null
+        }
+        return jsonString
     }
 }
