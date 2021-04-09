@@ -3,6 +3,7 @@ package com.example.historicmapsdo
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,8 +21,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var mMap: GoogleMap
     private val defaultLocationDortmund = LatLng(51.514426, 7.467263)
 
-    private lateinit var mLastSelectedMarker: Marker
-    private lateinit var mActiveSelectedMarker : Marker
+    private lateinit var mLastSelectedMarker: LatLng
+    private lateinit var mActiveSelectedMarker: Marker
 
     private var mapStatus: Int = 0
 
@@ -87,7 +88,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMarkerDragStart(p0: Marker?) {
         if (p0 != null) {
-            mLastSelectedMarker = p0
+            mLastSelectedMarker = p0.position
         }
     }
 
@@ -95,7 +96,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMapClick(p0: LatLng?) {
         if (p0 is LatLng) {
+            // Change Marker Location
+            mLastSelectedMarker = mActiveSelectedMarker.position
             mActiveSelectedMarker.position = p0
+            // Open Popup Menu
+
+            // check if user wants to change location or whatever
+            // if ()
+
+            // else -> revert state
+            Toast.makeText(applicationContext, "Revert to old marker location", Toast.LENGTH_SHORT).show()
+            mActiveSelectedMarker.position = mLastSelectedMarker
         }
         else {
             println("No LatLng found...")
