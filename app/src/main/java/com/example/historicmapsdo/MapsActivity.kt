@@ -1,11 +1,13 @@
 package com.example.historicmapsdo
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.View
-import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -15,17 +17,20 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.*
+import com.google.gson.Gson
+import java.io.File
+import java.io.IOException
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener, GoogleMap.OnMapClickListener,
-    GoogleMap.OnMarkerClickListener{
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    private lateinit var mapOverlay: GroundOverlay
+
     private val defaultLocationDortmund = LatLng(51.514426, 7.467263)
+    private val markerClass: MarkerClass = MarkerClass()
 
-    private lateinit var mLastSelectedMarker: LatLng
-    private lateinit var mActiveSelectedMarker: Marker
-
-    private var mapStatus: Int = 0
+    private var mapStatus: String = "Standard Karte"
+    private var mapList: ArrayList<JSONConsumer> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +39,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        readAssets()
+    }
+
+    private fun readAssets() {
+        val maps = assets.list("")?.filter { it.endsWith(".json") }
+        maps?.forEach {
+            val jsonFileString = getJsonDataFromAsset(applicationContext, it)
+            val gson = Gson()
+            mapList.add(gson.fromJson(jsonFileString, JSONConsumer::class.java))
+        }
     }
 
     /**
@@ -48,82 +63,49 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Marker in Dortmund").draggable(true))
-        mMap.setOnMarkerDragListener(this)
-        mMap.setOnMapClickListener(this)
+        markerClass.mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Marker in Dortmund").draggable(true))
+        mMap.setOnMarkerDragListener(markerClass)
+        mMap.setOnMapClickListener(markerClass)
         // Add a marker in Sydney and move the camera
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocationDortmund, 15f))
     }
 
     fun openChangeMap(view: View) {
-        startActivityForResult(Intent(this, ChangeMap::class.java), 1)
+        val namesOfMapList = arrayListOf<String>()
+        mapList.forEach { namesOfMapList.add(it.properties.name) }
+        startActivityForResult(Intent(this, ChangeMap::class.java).putStringArrayListExtra("mapList", namesOfMapList), 1)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        mapStatus = if (data?.getStringExtra("year") != null) data.getStringExtra("year")!!.toInt() else 0
+        mapStatus = if (data != null) data.getStringExtra("selectedMap")!! else "Standard Karte"
         changeMap()
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun changeMap() {
-        if (mapStatus != 0) {
-            val latLng = LatLng(51.51399991201712, 7.4639976024627686)
-            val mapOver = GroundOverlayOptions()
-            when (mapStatus) {
-                1858 -> {
-                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1858))
-                }
-                1945 -> {
-                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_1945))
-                }
-                2015 -> {
-                    mapOver.image(BitmapDescriptorFactory.fromResource(R.drawable.dortmund_2015))
-                }
-            }
-            mapOver.position(latLng, 1375f)
-            mMap.addGroundOverlay(mapOver)
-        }
-    }
-
-    override fun onMarkerDragEnd(p0: Marker?) {}
-
-    override fun onMarkerDragStart(p0: Marker?) {
-        if (p0 != null) {
-            mLastSelectedMarker = p0.position
-        }
-    }
-
-    override fun onMarkerDrag(p0: Marker?) {}
-
-    override fun onMapClick(p0: LatLng?) {
-        if (p0 is LatLng) {
-            // Change Marker Location for question
-            mLastSelectedMarker = mActiveSelectedMarker.position
-            mActiveSelectedMarker.position = p0
-            // Open Popup Menu - findViewById(R.id.map)
-            val popupMenu: PopupMenu = PopupMenu(this, findViewById(R.id.cm_but))
-            popupMenu.menuInflater.inflate(R.menu.popup_menu,popupMenu.menu)
-            popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-                when(item.itemId) {
-                    R.id.action_switchToNewLocation ->
-                        Toast.makeText(applicationContext, "Switching location", Toast.LENGTH_SHORT).show()
-                    R.id.action_revertToOldLocation ->
-                        mActiveSelectedMarker.position = mLastSelectedMarker
-                }
-                true
-            })
-            popupMenu.show()
-        }
-        else {
-            println("No LatLng found...")
-        }
-    }
-
-    override fun onMarkerClick(p0: Marker?): Boolean {
-        if (p0 is Marker) {
-            return true
+        if (mapStatus != "Standard Karte") {
+            val selectedMap: JSONConsumer = mapList.filter { it.properties.name == mapStatus }.first()
+            println(selectedMap.geometry.coordinates[1])
+            println(selectedMap.properties.width)
+            val latLng = LatLng(selectedMap.geometry.coordinates[1], selectedMap.geometry.coordinates[0])
+            val mapOverOpt = GroundOverlayOptions()
+            mapOverOpt.image(BitmapDescriptorFactory.fromResource(resources.getIdentifier(selectedMap.properties.pictureName, "drawable", applicationContext.packageName)))
+            mapOverOpt.position(latLng, selectedMap.properties.width)
+            mapOverlay = mMap.addGroundOverlay(mapOverOpt)
         } else {
-            return false
+            if(this::mapOverlay.isInitialized)
+                mapOverlay.remove()
         }
+    }
+
+    private fun getJsonDataFromAsset(context: Context, fileName: String): String? {
+        val jsonString: String
+        try {
+            jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+            return null
+        }
+        return jsonString
     }
 }
