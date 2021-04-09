@@ -7,6 +7,7 @@ import android.os.Environment
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -20,14 +21,18 @@ import com.google.gson.Gson
 import java.io.File
 import java.io.IOException
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener, GoogleMap.OnMapClickListener,
+    GoogleMap.OnMarkerClickListener{
 
     private lateinit var mMap: GoogleMap
     private val dortmund = LatLng(51.514426, 7.467263)
     private lateinit var mapOverlay: GroundOverlay
 
-    private lateinit var mLastSelectedMarker: Marker
     private val markerListener = MarkerDragListener()
+    private val defaultLocationDortmund = LatLng(51.514426, 7.467263)
+
+    private lateinit var mLastSelectedMarker: LatLng
+    private lateinit var mActiveSelectedMarker: Marker
 
     private lateinit var mapStatus: String
 
@@ -64,10 +69,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        mLastSelectedMarker = mMap.addMarker(MarkerOptions().position(dortmund).title("Marker in Dortmund").draggable(true))
-        mMap.setOnMarkerDragListener(markerListener)
+        mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Marker in Dortmund").draggable(true))
+        mMap.setOnMarkerDragListener(this)
+        mMap.setOnMapClickListener(this)
         // Add a marker in Sydney and move the camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dortmund, 15f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocationDortmund, 15f))
     }
 
     fun openChangeMap(view: View) {
@@ -107,5 +113,42 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             return null
         }
         return jsonString
+    }
+
+    override fun onMarkerDragEnd(p0: Marker?) {}
+
+    override fun onMarkerDragStart(p0: Marker?) {
+        if (p0 != null) {
+            mLastSelectedMarker = p0.position
+        }
+    }
+
+    override fun onMarkerDrag(p0: Marker?) {}
+
+    override fun onMapClick(p0: LatLng?) {
+        if (p0 is LatLng) {
+            // Change Marker Location
+            mLastSelectedMarker = mActiveSelectedMarker.position
+            mActiveSelectedMarker.position = p0
+            // Open Popup Menu
+
+            // check if user wants to change location or whatever
+            // if ()
+
+            // else -> revert state
+            Toast.makeText(applicationContext, "Revert to old marker location", Toast.LENGTH_SHORT).show()
+            mActiveSelectedMarker.position = mLastSelectedMarker
+        }
+        else {
+            println("No LatLng found...")
+        }
+    }
+
+    override fun onMarkerClick(p0: Marker?): Boolean {
+        if (p0 is Marker) {
+            return true
+        } else {
+            return false
+        }
     }
 }
