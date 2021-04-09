@@ -25,10 +25,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     GoogleMap.OnMarkerClickListener{
 
     private lateinit var mMap: GoogleMap
-    private val dortmund = LatLng(51.514426, 7.467263)
     private lateinit var mapOverlay: GroundOverlay
 
-    private val markerListener = MarkerDragListener()
     private val defaultLocationDortmund = LatLng(51.514426, 7.467263)
 
     private lateinit var mLastSelectedMarker: LatLng
@@ -104,7 +102,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
-    fun getJsonDataFromAsset(context: Context, fileName: String): String? {
+    private fun getJsonDataFromAsset(context: Context, fileName: String): String? {
         val jsonString: String
         try {
             jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
@@ -145,10 +143,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     override fun onMarkerClick(p0: Marker?): Boolean {
-        if (p0 is Marker) {
-            return true
-        } else {
-            return false
-        }
+        return (p0 is Marker)
     }
 }
