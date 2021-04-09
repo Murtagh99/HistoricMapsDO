@@ -3,6 +3,7 @@ package com.example.historicmapsdo
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
@@ -96,17 +97,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMapClick(p0: LatLng?) {
         if (p0 is LatLng) {
-            // Change Marker Location
+            // Change Marker Location for question
             mLastSelectedMarker = mActiveSelectedMarker.position
             mActiveSelectedMarker.position = p0
-            // Open Popup Menu
-
-            // check if user wants to change location or whatever
-            // if ()
-
-            // else -> revert state
-            Toast.makeText(applicationContext, "Revert to old marker location", Toast.LENGTH_SHORT).show()
-            mActiveSelectedMarker.position = mLastSelectedMarker
+            // Open Popup Menu - findViewById(R.id.map)
+            val popupMenu: PopupMenu = PopupMenu(this, findViewById(R.id.cm_but))
+            popupMenu.menuInflater.inflate(R.menu.popup_menu,popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+                when(item.itemId) {
+                    R.id.action_switchToNewLocation ->
+                        Toast.makeText(applicationContext, "Switching location", Toast.LENGTH_SHORT).show()
+                    R.id.action_revertToOldLocation ->
+                        mActiveSelectedMarker.position = mLastSelectedMarker
+                }
+                true
+            })
+            popupMenu.show()
         }
         else {
             println("No LatLng found...")
