@@ -1,24 +1,21 @@
 package com.example.historicmapsdo
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.Toast
-
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
-import java.io.File
 import java.io.IOException
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -31,6 +28,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var mapStatus: String = "Standard Karte"
     private var mapList: ArrayList<JSONConsumer> = arrayListOf()
+
+    private val req = registerForActivityResult(ActivityResultContracts.RequestPermission()){}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,12 +61,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
         markerClass.mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Marker in Dortmund").draggable(true))
         mMap.setOnMarkerDragListener(markerClass)
         mMap.setOnMapClickListener(markerClass)
         // Add a marker in Sydney and move the camera
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocationDortmund, 15f))
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            req.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        mMap.isMyLocationEnabled = true
     }
 
     fun openChangeMap(view: View) {
@@ -83,18 +92,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun changeMap() {
+        if(this::mapOverlay.isInitialized)
+            mapOverlay.remove()
         if (mapStatus != "Standard Karte") {
             val selectedMap: JSONConsumer = mapList.filter { it.properties.name == mapStatus }.first()
-            println(selectedMap.geometry.coordinates[1])
-            println(selectedMap.properties.width)
             val latLng = LatLng(selectedMap.geometry.coordinates[1], selectedMap.geometry.coordinates[0])
             val mapOverOpt = GroundOverlayOptions()
             mapOverOpt.image(BitmapDescriptorFactory.fromResource(resources.getIdentifier(selectedMap.properties.pictureName, "drawable", applicationContext.packageName)))
             mapOverOpt.position(latLng, selectedMap.properties.width)
             mapOverlay = mMap.addGroundOverlay(mapOverOpt)
-        } else {
-            if(this::mapOverlay.isInitialized)
-                mapOverlay.remove()
         }
     }
 
@@ -108,4 +114,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         return jsonString
     }
+
+    /*
+    override fun onStop() {
+        super.onStop()
+        println("Stopped")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        println("Destroyed")
+    }
+     */
 }
