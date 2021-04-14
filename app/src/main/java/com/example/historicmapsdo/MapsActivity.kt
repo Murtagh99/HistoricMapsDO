@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -14,8 +16,12 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
+import java.io.File
 import java.io.IOException
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -24,7 +30,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mapOverlay: GroundOverlay
 
     private val defaultLocationDortmund = LatLng(51.514426, 7.467263)
-    private val markerClass: MarkerClass = MarkerClass()
+    private val markerClass: MarkerClass = MarkerClass(this)
 
     private var mapStatus: String = "Standard Karte"
     private var mapList: ArrayList<JSONConsumer> = arrayListOf()
@@ -61,7 +67,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        markerClass.mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Marker in Dortmund").draggable(true))
+        markerClass.mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Standortmarker").draggable(true))
         mMap.setOnMarkerDragListener(markerClass)
         mMap.setOnMapClickListener(markerClass)
         // Add a marker in Sydney and move the camera
@@ -114,16 +120,4 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         return jsonString
     }
-
-    /*
-    override fun onStop() {
-        super.onStop()
-        println("Stopped")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        println("Destroyed")
-    }
-     */
 }
