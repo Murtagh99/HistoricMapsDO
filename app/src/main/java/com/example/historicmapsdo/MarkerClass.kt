@@ -11,15 +11,10 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 
-class MarkerClass(activity: Activity) : GoogleMap.OnMarkerDragListener, GoogleMap.OnMapClickListener,
+class MarkerClass(var activity: Activity) : GoogleMap.OnMarkerDragListener, GoogleMap.OnMapClickListener,
     GoogleMap.OnMarkerClickListener {
     lateinit var mActiveSelectedMarker: Marker
     lateinit var mLastSelectedMarker: LatLng
-    lateinit var activity: Activity
-
-    init {
-        this.activity = activity
-    }
 
     override fun onMarkerDragEnd(p0: Marker?) {}
 
