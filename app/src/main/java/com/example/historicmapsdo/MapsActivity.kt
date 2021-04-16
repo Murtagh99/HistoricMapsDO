@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.StrictMode
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
 import java.io.IOException
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -32,6 +34,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
         setContentView(R.layout.activity_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -60,7 +64,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        markerClass.mActiveSelectedMarker = mMap.addMarker(MarkerOptions().position(defaultLocationDortmund).title("Standortmarker").draggable(true))
+        markerClass.mActiveSelectedMarker = mMap.addMarker(
+            MarkerOptions().position(
+                defaultLocationDortmund
+            ).title("Standortmarker").draggable(true)
+        )
         mMap.setOnMarkerDragListener(markerClass)
         mMap.setOnMapClickListener(markerClass)
         // Add a marker in Sydney and move the camera
@@ -81,7 +89,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     fun openChangeMap(view: View) {
         val namesOfMapList = arrayListOf<String>()
         mapList.forEach { namesOfMapList.add(it.properties.name) }
-        startActivityForResult(Intent(this, ChangeMap::class.java).putStringArrayListExtra("mapList", namesOfMapList), 1)
+        startActivityForResult(
+            Intent(this, ChangeMap::class.java).putStringArrayListExtra(
+                "mapList",
+                namesOfMapList
+            ), 1
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -95,9 +108,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             mapOverlay.remove()
         if (mapStatus != "Standard Karte") {
             val selectedMap: JSONConsumer = mapList.filter { it.properties.name == mapStatus }.first()
-            val latLng = LatLng(selectedMap.geometry.coordinates[1], selectedMap.geometry.coordinates[0])
+            val latLng = LatLng(
+                selectedMap.geometry.coordinates[1],
+                selectedMap.geometry.coordinates[0]
+            )
             val mapOverOpt = GroundOverlayOptions()
-            mapOverOpt.image(BitmapDescriptorFactory.fromResource(resources.getIdentifier(selectedMap.properties.pictureName, "drawable", applicationContext.packageName)))
+            mapOverOpt.image(
+                BitmapDescriptorFactory.fromResource(
+                    resources.getIdentifier(
+                        selectedMap.properties.pictureName,
+                        "drawable",
+                        applicationContext.packageName
+                    )
+                )
+            )
             mapOverOpt.position(latLng, selectedMap.properties.width)
             mapOverlay = mMap.addGroundOverlay(mapOverOpt)
         }
