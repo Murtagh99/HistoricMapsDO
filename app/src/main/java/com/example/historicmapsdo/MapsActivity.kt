@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationListener
 import android.os.Bundle
 import android.os.StrictMode
 import android.view.View
@@ -23,6 +24,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var mapOverlay: GroundOverlay
+    private lateinit var route: Polyline
 
     private val defaultLocationDortmund = LatLng(51.514426, 7.467263)
     private val markerClass: MarkerClass = MarkerClass(this)
@@ -30,6 +32,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var mapStatus: String = "Standard Karte"
     private var mapList: ArrayList<JSONConsumer> = arrayListOf()
 
+    private lateinit var navigator: NavigationHandler
     private val req = registerForActivityResult(ActivityResultContracts.RequestPermission()){}
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +87,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             req.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
         mMap.isMyLocationEnabled = true
+        navigator = NavigationHandler(this)
     }
 
     fun openChangeMap(view: View) {
@@ -136,5 +140,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             return null
         }
         return jsonString
+    }
+
+    fun getRoute(view: View) {
+        if (this::route.isInitialized)
+            route.remove()
+        navigator.doRequest(LatLng(mMap.myLocation.latitude, mMap.myLocation.longitude), markerClass.mActiveSelectedMarker.position)
+        route = mMap.addPolyline(navigator.plo)
     }
 }

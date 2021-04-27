@@ -9,4 +9,5 @@
     <string name="apply">Apply</string>
     <string name="newLoc">Switch to new location</string>
     <string name="revLoc">Go back to previous one</string>
+    <string name="route_but">↲</string>
 </resources>
