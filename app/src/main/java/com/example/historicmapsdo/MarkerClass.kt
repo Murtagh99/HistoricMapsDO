@@ -26,7 +26,7 @@ class MarkerClass(var activity: Activity) : GoogleMap.OnMarkerDragListener, Goog
     override fun onMapClick(p0: LatLng?) {
         if (p0 is LatLng) {
             // Change Marker Location
-            val nummer: Button = activity.findViewById<Button>(R.id.cm_but)
+            val nummer: Button = activity.findViewById(R.id.cm_but)
             mLastSelectedMarker = mActiveSelectedMarker.position
             mActiveSelectedMarker.position = p0
             // Open Popup Menu - findViewById(R.id.cm_but)
